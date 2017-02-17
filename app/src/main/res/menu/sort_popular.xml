@@ -4,5 +4,7 @@
 <item android:title="@string/sort_by_popularity"
     app:showAsAction="never"
     android:id="@+id/sort_popular"
-    ></item>
+    >
+
+</item>
 </menu>

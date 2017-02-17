@@ -21,8 +21,10 @@ import java.util.List;
 public class ImageAdapter extends ArrayAdapter<String> {
     private final String log_tag = ImageAdapter.class.getSimpleName();
     private Context context;
+    ImageView imageView;
     private LayoutInflater inflater;
     public ImageAdapter(Activity context,List<String> urllist) {
+
         super(context,0,urllist);
 this.context=context;
         this.inflater=context.getLayoutInflater();
@@ -34,13 +36,14 @@ this.context=context;
         if (convertView==null) {
             convertView=inflater.inflate(R.layout.list,parent,false);
         }
+
         ImageView imageView= (ImageView) convertView;
         Picasso
                 .with(context)
                 .load(getItem(position))
                 .into(imageView);
         Log.v(log_tag,"Picasso:"+getItem(position).toString());
-
+//Picasso.with(context).load(getItem(position)).into();
         return imageView;
 
     }

@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,9 +36,14 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     ImageAdapter myCustomArrayAdapter;
     GridView gv;
     String fetchurl;
+    float[] ratingdet;
+    String[] posterUrl;
+    String[] Datedetail;
+    ImageView imageView;
     String[] moviedetail;
-    List<String> urllist= new ArrayList<String>();
-    final String M_OverV = "overview";
+    String[] titledetail;
+    List<String> urllist = new ArrayList<String>();
+
     public MainActivityFragment() {
     }
 
@@ -44,13 +53,15 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
 
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
-        gv= (GridView) rootview.findViewById(R.id.grid_view);
+        gv = (GridView) rootview.findViewById(R.id.grid_view);
         gv.setOnItemClickListener(this);
-        myCustomArrayAdapter = new ImageAdapter(getActivity(),urllist);
+        myCustomArrayAdapter = new ImageAdapter(getActivity(), urllist);
         gv.setAdapter(myCustomArrayAdapter);
+        // imageView = (ImageView) rootview.findViewById(R.id.load_thumbnail);
         return rootview;
 
     }
+
 
     @Override
     public void onStart() {
@@ -60,90 +71,133 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-        Intent movieintent= new Intent(getActivity().getApplicationContext(),DetailActivity.class);
+        Intent movieintent = new Intent(getActivity().getApplicationContext(), DetailActivity.class);
 
-        String movieOverviewdata=moviedetail[i];
-        movieintent.putExtra("Movie_overview",movieOverviewdata);
+        String movieOverviewdata = moviedetail[i];
+        String titledata = titledetail[i];
+        Float rating = ratingdet[i];
+        String date = Datedetail[i];
+        String finalurl = posterUrl[i];
+        movieintent.putExtra("Movie_overview", movieOverviewdata);
+        movieintent.putExtra("Movie_Title", titledata);
+        movieintent.putExtra("Movie_rating", rating.toString());
+        movieintent.putExtra("Release_Date", date);
+        movieintent.putExtra("fetchurl", finalurl);
+
         startActivity(movieintent);
     }
 
-    public  class fetchposter extends AsyncTask<Void, Void, List<String>> {
-    
-    private final String log_tag = fetchposter.class.getSimpleName();
-    @Override
-    protected List<String> doInBackground(Void... params) {
-        String imgurl = "http://image.tmdb.org/t/p/w185";
-        HttpURLConnection urlConnection = null;
-        String jsonstr = null;
+    public class fetchposter extends AsyncTask<String, Void, List<String>> {
 
-        URL url = null;
+        private final String log_tag = fetchposter.class.getSimpleName();
 
-        try {
-            url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=b2131e0b7ca718dd5b831c5076e66d5c");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        @Override
+        protected List<String> doInBackground(String... params) {
+            String imgurl = "http://image.tmdb.org/t/p/w500";
+            HttpURLConnection urlConnection = null;
+            String jsonstr = null;
+            String sortBy = params[0];
+            URL url = null;
+
+            try {
+                url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by="+sortBy+"&api_key=b2131e0b7ca718dd5b831c5076e66d5c");
+               // http://api.themoviedb.org/3/discover/movie?sort_by=top_rated.desc&api_key=b2131e0b7ca718dd5b831c5076e66d5c
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                InputStream inputstream = urlConnection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputstream));
+                StringBuffer buffer = new StringBuffer();
+                if (inputstream == null) {
+                    return null;
+                }
+
+                String line;
+                while ((line = br.readLine()) != null) {
+
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) {
+                    // Stream was empty.
+                    return null;
+                }
+                jsonstr = buffer.toString();
+                JSONObject obj = new JSONObject(jsonstr);
+                JSONArray jarray = obj.getJSONArray("results");
+                titledetail = new String[jarray.length()];
+                moviedetail = new String[jarray.length()];
+                ratingdet = new float[jarray.length()];
+                Datedetail = new String[jarray.length()];
+                posterUrl = new String[jarray.length()];
+                List<String> strings = new ArrayList<String>();
+
+                for (int i = 0; i < jarray.length(); i++) {
+                    JSONObject object = jarray.getJSONObject(i);
+                    String posterPath = object.getString("poster_path");
+                    fetchurl = imgurl + posterPath;
+                    strings.add(fetchurl);
+                    Log.v(log_tag, "poster_path" + posterPath.toString());
+                    moviedetail[i] = object.getString("overview");
+                    Datedetail[i] = object.getString("release_date");
+                    posterUrl[i] = fetchurl;
+                    titledetail[i] = object.getString("title");
+                    ratingdet[i] = Float.valueOf(object.getString("vote_average"));
+                }
+                Log.v(log_tag, "url list size" + strings.size());
+                return strings;
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
-        try {
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            InputStream inputstream = urlConnection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputstream));
-            StringBuffer buffer = new StringBuffer();
-            if (inputstream == null) {
-                return null;
-            }
-
-            String line;
-            while ((line = br.readLine()) != null) {
-
-                buffer.append(line + "\n");
-            }
-            if (buffer.length() == 0) {
-                // Stream was empty.
-                return null;
-            }
-            jsonstr = buffer.toString();
-            JSONObject obj = new JSONObject(jsonstr);
-            JSONArray jarray = obj.getJSONArray("results");
-
-moviedetail= new String[jarray.length()];
-List<String>strings= new ArrayList<String>();
-
-            for (int i = 0; i < jarray.length(); i++) {
-                JSONObject object = jarray.getJSONObject(i);
-                String posterPath = object.getString("poster_path");
-
-               fetchurl=imgurl+posterPath;
-               strings.add(fetchurl);
-                Log.v(log_tag,"poster_path"+posterPath.toString());
-           moviedetail[i]=object.getString("overview");
-
-            }  Log.v(log_tag,"url list size"+strings.size());
-            return strings;
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
 
 
         @Override
-    protected void onPostExecute(List<String> strings) {
-        myCustomArrayAdapter.clear();
+        protected void onPostExecute(List<String> strings) {
+            myCustomArrayAdapter.clear();
 
-        super.onPostExecute(strings);
+            super.onPostExecute(strings);
             myCustomArrayAdapter.addAll(strings);
-            Log.v(log_tag,"String list size"+strings.size());
+            Log.v(log_tag, "String list size" + strings.size());
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.sort_top_rated, menu);
+        inflater.inflate(R.menu.sort_popular, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_popular:
+                new fetchposter().execute("top_rated.desc");
+
+
+
+            case  R.id.sort_top:{
+                new fetchposter().execute("top_rated.desc");
+
+
+
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 
-}
+
