@@ -1,8 +1,12 @@
 package app.portfolio.popularmovies1;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,6 +46,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     ImageView imageView;
     String[] moviedetail;
     String[] titledetail;
+    AppBarLayout movie;
     List<String> urllist = new ArrayList<String>();
 
     public MainActivityFragment() {
@@ -55,18 +60,31 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         View rootview = inflater.inflate(R.layout.fragment_main, container, false);
         gv = (GridView) rootview.findViewById(R.id.grid_view);
         gv.setOnItemClickListener(this);
+        setHasOptionsMenu(true);
         myCustomArrayAdapter = new ImageAdapter(getActivity(), urllist);
         gv.setAdapter(myCustomArrayAdapter);
-        // imageView = (ImageView) rootview.findViewById(R.id.load_thumbnail);
         return rootview;
 
     }
+    boolean CheckConnection()
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+  return true;  }
+
 
 
     @Override
     public void onStart() {
+
+
+        new fetchposter().execute("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=b2131e0b7ca718dd5b831c5076e66d5c");
         super.onStart();
-        new fetchposter().execute();
     }
 
     @Override
@@ -171,30 +189,34 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             myCustomArrayAdapter.addAll(strings);
             Log.v(log_tag, "String list size" + strings.size());
         }
+
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.sort_top_rated, menu);
         inflater.inflate(R.menu.sort_popular, menu);
+        inflater.inflate(R.menu.sort_top_rated, menu);
+
         super.onCreateOptionsMenu(menu, inflater);
+
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_popular:
-                new fetchposter().execute("top_rated.desc");
+                new fetchposter().execute("popularity.desc");
 
-
+return true;
 
             case  R.id.sort_top:{
                 new fetchposter().execute("top_rated.desc");
-
+return true;
 
 
             }
-            default:
+            default:new fetchposter().execute("popularity.desc");
                 return super.onOptionsItemSelected(item);
         }
     }

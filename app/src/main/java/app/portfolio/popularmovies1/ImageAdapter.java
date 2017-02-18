@@ -41,6 +41,8 @@ this.context=context;
         Picasso
                 .with(context)
                 .load(getItem(position))
+                .placeholder(R.drawable.load)
+                .error(R.drawable.sym)
                 .into(imageView);
         Log.v(log_tag,"Picasso:"+getItem(position).toString());
 //Picasso.with(context).load(getItem(position)).into();

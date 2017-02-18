@@ -1,69 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_movie_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-android:padding="10dp"
-    tools:context="app.portfolio.popularmovies1.MovieDetailsFragment">
+    android:fitsSystemWindows="true"
+   >
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView3"
-        android:layout_below="@+id/imageView"
-        android:hint="movie will appear here"
-
-        />
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:id="@+id/Scroll_lin"
-    android:layout_below="@+id/textView3"
-    android:layout_height="wrap_content">
-    <ScrollView
-    android:layout_width="wrap_content"
-    android:id="@+id/scrollview"
-    android:layout_below="@+id/textView2"
-    android:layout_height="wrap_content">
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:hint="movie will appear here"
-        />
-</ScrollView>
-</LinearLayout>
-    <ImageView
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/btn_star_big_on"
-        android:id="@+id/imageView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-         />
+        android:layout_height="@dimen/app_bar_height"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView5"
-        android:hint="movie will appear here"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
 
-        android:layout_marginBottom="25dp"
-        android:layout_below="@+id/Scroll_lin"
-        android:layout_alignParentStart="true" />
+                android:id="@+id/imageView"
+               />
 
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView2"
-        android:hint="movie will appear here"
-        android:layout_marginTop="3dp"
-        android:layout_below="@+id/textView5"
-        android:layout_alignParentStart="true" />
-</RelativeLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+
+
+    <include layout="@layout/content_scrolling" />
+
+</android.support.design.widget.CoordinatorLayout>
+

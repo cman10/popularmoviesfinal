@@ -21,10 +21,12 @@ public class MovieDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
      View rootView=inflater.inflate(R.layout.fragment_movie_details,container,false);
         TextView textView= (TextView) rootView.findViewById(R.id.textView);
+
         TextView textView2= (TextView) rootView.findViewById(R.id.textView2);
         TextView textView3= (TextView) rootView.findViewById(R.id.textView3);
         TextView textView4= (TextView) rootView.findViewById(R.id.textView5);
         ImageView load_thumb= (ImageView) rootView.findViewById(R.id.imageView);
+        ImageView fab= (ImageView) rootView.findViewById(R.id.fab);
         load_thumb.setScaleType(ImageView.ScaleType.FIT_XY);
         Intent intent= getActivity().getIntent();
         if (intent!=null && intent.hasExtra("Movie_overview"))
@@ -56,6 +58,7 @@ public class MovieDetailsFragment extends Fragment {
         {
             url=intent.getStringExtra("fetchurl");
             Picasso.with(getContext()).load(url).into(load_thumb);
+            Picasso.with(getContext()).load(url).into(fab);
 
         }
 
