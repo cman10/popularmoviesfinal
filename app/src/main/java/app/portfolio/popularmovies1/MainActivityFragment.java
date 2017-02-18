@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +51,10 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     List<String> urllist = new ArrayList<String>();
 
     public MainActivityFragment() {
+
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,17 +78,28 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
+        if(isConnected==false){
 
-  return true;  }
+
+        }
+
+  return isConnected;  }
 
 
 
     @Override
     public void onStart() {
+if(CheckConnection()){
+    new fetchposter().execute("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=b2131e0b7ca718dd5b831c5076e66d5c");
+    super.onStart();
+}
+        else {
+    Toast.makeText(getContext(),"ERROR NO Internet...Try again later",Toast.LENGTH_LONG).show();
+
+    super.onStart();
+        }
 
 
-        new fetchposter().execute("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=b2131e0b7ca718dd5b831c5076e66d5c");
-        super.onStart();
     }
 
     @Override
@@ -206,13 +221,30 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_popular:
-                new fetchposter().execute("popularity.desc");
+                if(CheckConnection()){
+                    new fetchposter().execute("popularity.desc");
+                    super.onStart();
+                }
+                else {
+                    Toast.makeText(getContext(),"ERROR NO Internet...Try again later",Toast.LENGTH_LONG).show();
 
-return true;
+                    super.onStart();
+                }
+
+                return true;
 
             case  R.id.sort_top:{
-                new fetchposter().execute("top_rated.desc");
-return true;
+                if(CheckConnection()){
+                    new fetchposter().execute("top_rated.desc");
+                    super.onStart();
+                }
+                else {
+                    Toast.makeText(getContext(),"ERROR NO Internet...Try again later",Toast.LENGTH_LONG).show();
+                    super.onStart();
+                }
+
+
+                return true;
 
 
             }

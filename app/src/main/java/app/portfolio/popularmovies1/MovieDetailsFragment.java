@@ -38,7 +38,7 @@ public class MovieDetailsFragment extends Fragment {
         if (intent!=null && intent.hasExtra("Movie_rating"))
         {
             rating=intent.getStringExtra("Movie_rating");
-            textView2.setText("\n"+rating);
+            textView2.setText("\n\n\n      "+rating);
 
         }
         if (intent!=null && intent.hasExtra("Movie_Title"))
